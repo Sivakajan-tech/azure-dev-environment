@@ -31,11 +31,33 @@ A list of common Terraform commands used for managing infrastructure as code.
 ### Destroying
 
 - `terraform destroy`: Destroy the Terraform-managed infrastructure.
+- This is same as `terraform apply -destroy`.
 
 ### State Management
 
 - `terraform state list`: List resources in the Terraform state.
 - `terraform state show <resource>`: Show detailed state information for a resource.
+
+Eg:
+
+```
+PS C:\Users\sivak\Desktop\azure-dev-environment> terraform state list     
+azurerm_resource_group.az-res-grp
+azurerm_virtual_network.az-vn
+
+PS C:\Users\sivak\Desktop\azure-dev-environment> terraform state show azurerm_resource_group.az-res-grp
+# azurerm_resource_group.az-res-grp:
+resource "azurerm_resource_group" "az-res-grp" {
+    id       = "/subscriptions/7aed14a6-7fe2-4049-ad77-6c6481ffb640/resourceGroups/az-res-grp"
+    location = "eastus"
+    name     = "az-res-grp"
+    tags     = {
+        "environment" = "dev"
+    }
+}
+```
+
+- The `terraform show` command is used to provide the details about all state.
 
 ### Output
 
