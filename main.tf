@@ -15,9 +15,9 @@ provider "azurerm" {
 # resource <resource_type> <resource_name/alias>
 resource "azurerm_resource_group" "az-res-grp" {
   name     = "az-res-grp-1" # This not need to be same as alias.
-  location = "Central India"
+  location = var.location
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
 }
 
@@ -34,7 +34,7 @@ resource "azurerm_virtual_network" "az-vn" {
   # The address space that is used by the virtual network.
   address_space = ["10.0.0.0/16"]
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
 }
 
@@ -52,7 +52,7 @@ resource "azurerm_network_security_group" "az-nsg" {
   location            = azurerm_resource_group.az-res-grp.location
   resource_group_name = azurerm_resource_group.az-res-grp.name
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
   # security_rule = # This can be added here. But we are adding it separately.-> nsg_rule
 }
@@ -86,7 +86,7 @@ resource "azurerm_public_ip" "az-pip" {
   allocation_method   = "Dynamic"
   sku                 = "Basic"
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
 }
 
@@ -104,7 +104,7 @@ resource "azurerm_network_interface" "az-nic" {
   }
 
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
 }
 
@@ -114,11 +114,15 @@ resource "azurerm_linux_virtual_machine" "az-vm" {
   name                = "az-linux-vm-1"
   resource_group_name = azurerm_resource_group.az-res-grp.name
   location            = azurerm_resource_group.az-res-grp.location
-  size                = "Standard_B1s"
+  size                = var.virtual_machine_size
   admin_username      = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.az-nic.id
   ]
+
+  # https://developer.hashicorp.com/terraform/language/functions/filebase64
+  custom_data = filebase64("customdata.tpl")
+
   # To create a key pair, you can use the ssh-keygen command.
   /*
   PS C:\Users\sivak\Desktop\azure-dev-environment> ssh-keygen -t rsa
@@ -169,6 +173,15 @@ resource "azurerm_linux_virtual_machine" "az-vm" {
   }
 
   tags = {
-    environment = "dev"
+    environment = var.environment
   }
+}
+
+data "azurerm_public_ip" "az-ip-data" {
+  name                = azurerm_public_ip.az-pip.name
+  resource_group_name = azurerm_resource_group.az-res-grp.name
+}
+
+output "public_ip_address_id" {
+  value = "${azurerm_linux_virtual_machine.az-vm.name}: ${data.azurerm_public_ip.az-ip-data.ip_address}"
 }
