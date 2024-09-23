@@ -1,89 +1,75 @@
 # Azure dev Environment
 
-This repository contains the code for the Azure Dev Environment project. The project is a simple web application that allows users to create, read, update, and delete (CRUD) notes.
+This repository contains the code for the Azure Dev Environment project. The project is a simple infrastructure as code (IaC) project that creates a virtual network and a resource group in Azure using Terraform.
 
-# Terraform Commands
+This Terraform project provisions an Azure environment with the following resources:
+- Resource Group
+- Virtual Network (VNet) and Subnet
+- Network Security Group (NSG) with a security rule
+- Public IP address
+- Network Interface (NIC)
+- Linux Virtual Machine (VM)
 
-A list of common Terraform commands used for managing infrastructure as code.
+## Prerequisites
 
-## Common Commands
+- Terraform 0.14+ installed on your machine.
+- Azure subscription credentials set up locally (e.g., using Azure CLI or environment variables).
+- SSH key pair for authentication with the VM.
 
-### Initialization
+## Usage
 
-- `terraform init`: Initialize a new or existing Terraform configuration.
-
-### Validation
-
-- `terraform validate`: Validate the Terraform configuration files.
-
-### Formatting
-
-- `terraform fmt`: Format the Terraform configuration files to a canonical format.
-
-### Planning
-
-- `terraform plan`: Generate and show an execution plan.
-
-### Applying
-
-- `terraform apply`: Build or change infrastructure according to the Terraform configuration.
-
-### Destroying
-
-- `terraform destroy`: Destroy the Terraform-managed infrastructure.
-- This is same as `terraform apply -destroy`.
-
-### State Management
-
-- `terraform state list`: List resources in the Terraform state.
-- `terraform state show <resource>`: Show detailed state information for a resource.
-
-Eg:
-
-```
-PS C:\Users\sivak\Desktop\azure-dev-environment> terraform state list     
-azurerm_resource_group.az-res-grp
-azurerm_virtual_network.az-vn
-
-PS C:\Users\sivak\Desktop\azure-dev-environment> terraform state show azurerm_resource_group.az-res-grp
-# azurerm_resource_group.az-res-grp:
-resource "azurerm_resource_group" "az-res-grp" {
-    id       = "/subscriptions/7aed14a6-7fe2-4049-ad77-6c6481ffb640/resourceGroups/az-res-grp"
-    location = "eastus"
-    name     = "az-res-grp"
-    tags     = {
-        "environment" = "dev"
-    }
-}
+### 1. Clone the repository
+```bash
+git clone https://github.com/Sivakajan-tech/azure-dev-environment.git
+cd azure-dev-environment
 ```
 
-- The `terraform show` command is used to provide the details about all state.
+### 2. Configure variables
+Edit the `variables.tf` file or provide the following variables through a `.tfvars` file or command line:
 
-### Output
+- `location`: The Azure region (e.g., East US).
+- `environment`: The deployment environment (e.g., dev, prod).
+- `virtual_machine_size`: The size of the VM (e.g., Standard_B1s).
 
-- `terraform output`: Show the outputs of the Terraform configuration.
+### 3. Initialize Terraform
+Run the following command to initialize the Terraform configuration:
+```bash
+terraform init
+```
 
-### Providers
+### 4. Plan the deployment
+Use the following command to see the execution plan before applying:
+```bash
+terraform plan
+```
 
-- `terraform providers`: Show the providers required for the configuration.
+### 5. Apply the configuration
+Apply the Terraform configuration to create the Azure resources:
+```bash
+terraform apply
+```
+You will be prompted to confirm the apply process by typing `yes`.
 
-### Workspaces
+### 6. Output
+After the deployment is complete, the public IP of the VM will be displayed:
 
-- `terraform workspace list`: List all available workspaces.
-- `terraform workspace select <workspace>`: Select a specific workspace.
+```bash
+Outputs:
+public_ip_address_id = "<VM Name>: <Public IP>"
+```
 
-### Importing
+You can use this IP to SSH into the virtual machine:
 
-- `terraform import <address> <id>`: Import existing infrastructure into Terraform.
 
-### Graphing
+```bash
+ssh adminuser@<public_ip_address> -i ~/.ssh/az-key
+```
 
-- `terraform graph`: Generate a visual representation of the configuration.
+Make sure you use the private key that corresponds to the public key added during VM creation.
 
-### Debugging
-
-- `terraform debug`: Enable detailed logs for debugging purposes.
-
-## Additional Resources
-
-For more detailed information, refer to the [Terraform documentation](https://www.terraform.io/docs).
+### 7. Destroy the resources
+To destroy the Azure resources created by Terraform, run:
+```bash
+terraform destroy
+```
+You will be prompted to confirm the destruction by typing `yes`.
