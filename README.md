@@ -31,6 +31,8 @@ Edit the `variables.tf` file or provide the following variables through a `.tfva
 - `environment`: The deployment environment (e.g., dev, prod).
 - `virtual_machine_size`: The size of the VM (e.g., Standard_B1s).
 
+Add your Subscription ID on the main.tf file.
+
 ### 3. Initialize Terraform
 Run the following command to initialize the Terraform configuration:
 ```bash
